@@ -1,0 +1,5 @@
+# Synthetic smoke-test protocol. These labels are for software validation only.
+DEMO_SPK_001 demo_bonafide_001 - - bonafide
+DEMO_SPK_002 demo_bonafide_002 - - bonafide
+DEMO_SPK_003 demo_spoof_001 - A01 spoof
+DEMO_SPK_004 demo_spoof_002 - A01 spoof

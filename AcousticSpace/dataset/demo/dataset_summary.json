@@ -1,0 +1,9 @@
+{
+  "source_dataset": "Synthetic smoke test",
+  "split": "demo",
+  "total": 4,
+  "bonafide": 2,
+  "spoof": 2,
+  "missing_files": 0,
+  "manifest": "dataset/demo/manifest.csv"
+}

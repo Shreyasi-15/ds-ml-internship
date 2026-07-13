@@ -1,0 +1,52 @@
+* { box-sizing: border-box; }
+
+:root {
+  font-family: Inter, "Segoe UI", sans-serif;
+  color: #e8edf7;
+  background: #090d15;
+  font-synthesis: none;
+}
+
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input { font: inherit; }
+
+.app-shell { max-width: 780px; margin: 56px auto; padding: 0 22px 56px; }
+.status-pill { display: inline-flex; padding: 6px 10px; border: 1px solid #284866; border-radius: 999px; color: #8fc7f2; background: #101d2b; font-size: .78rem; font-weight: 700; }
+h1 { margin: 14px 0 4px; font-size: clamp(2rem, 7vw, 3.4rem); letter-spacing: -.04em; }
+.subtitle { margin: 0 0 28px; color: #98a4b8; line-height: 1.55; }
+
+.upload-zone { display: block; padding: 42px 22px; text-align: center; cursor: pointer; background: #111827; border: 2px dashed #334155; border-radius: 16px; transition: .2s ease; }
+.upload-zone:hover, .upload-zone.dragging { border-color: #60a5fa; background: #142034; transform: translateY(-1px); }
+.upload-zone input { display: none; }
+.upload-zone p { margin: 0; }
+.upload-zone .hint { margin-top: 7px; color: #7f8da3; font-size: .83rem; }
+.upload-icon { margin-bottom: 12px; color: #60a5fa; }
+
+.result-card, .results-panel, .error-card { margin-top: 18px; border-radius: 14px; }
+.result-card { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 18px 20px; background: #111827; border: 1px solid #273449; }
+.result-info p { margin: 2px 0; }
+.result-actions { display: flex; align-items: center; gap: 12px; color: #a78bfa; }
+button { border: 0; border-radius: 9px; padding: 10px 18px; color: white; background: linear-gradient(135deg, #7c3aed, #2563eb); cursor: pointer; font-weight: 700; }
+button:hover:not(:disabled) { filter: brightness(1.12); }
+button:disabled { opacity: .62; cursor: wait; }
+
+.progress-row { display: flex; align-items: center; gap: 10px; margin-top: 11px; }
+.progress-track { width: min(310px, 45vw); height: 7px; overflow: hidden; border-radius: 99px; background: #263248; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, #f59e0b, #facc15); transition: width .2s ease; }
+.progress-label { min-width: 38px; color: #facc15; font-size: .8rem; }
+.error-card { padding: 14px 18px; color: #fecaca; background: #34151b; border: 1px solid #7f1d1d; }
+
+.results-panel { padding: 22px; background: #101827; border: 1px solid #273449; }
+.results-panel h2 { margin: 0; font-size: 1.2rem; }
+.evidence-note { margin: 7px 0 18px; color: #95a3b8; font-size: .88rem; line-height: 1.45; }
+.metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.metrics-grid div { display: flex; flex-direction: column; gap: 5px; padding: 13px 14px; border-radius: 10px; background: #182235; }
+.metrics-grid span { color: #8e9bb0; font-size: .78rem; }
+.metrics-grid strong { font-size: .98rem; }
+
+@media (max-width: 620px) {
+  .app-shell { margin-top: 30px; }
+  .result-card { align-items: flex-start; flex-direction: column; }
+  .metrics-grid { grid-template-columns: 1fr; }
+  .progress-track { width: 58vw; }
+}

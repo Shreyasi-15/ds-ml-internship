@@ -1,0 +1,5 @@
+filepath,label,label_name,speaker_id,attack_id,split
+dataset/demo/audio/demo_bonafide_001.wav,0,bonafide,DEMO_SPK_001,-,demo
+dataset/demo/audio/demo_bonafide_002.wav,0,bonafide,DEMO_SPK_002,-,demo
+dataset/demo/audio/demo_spoof_001.wav,1,spoof,DEMO_SPK_003,A01,demo
+dataset/demo/audio/demo_spoof_002.wav,1,spoof,DEMO_SPK_004,A01,demo
