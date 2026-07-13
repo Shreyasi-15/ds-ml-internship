@@ -1,13 +1,20 @@
-venv/
-node_modules/
-__pycache__/
+# Archives
+*.zip
+# Full datasets
+**/dataset/raw/
+**/dataset/ASVspoof*/
+# Local environments and dependencies
+**/.venv/
+**/venv/
+**/node_modules/
+**/dist/
+**/__pycache__/
+**/.pytest_cache/
+# Generated ML files
+**/backend/data/manifests/
+**/checkpoints/
+**/outputs/
 *.pyc
-*.pyd
-.Python
-dist/
-dist-ssr/
-*.local
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+*.pt
+*.pth
+*.onnx
