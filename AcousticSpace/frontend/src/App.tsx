@@ -82,7 +82,6 @@ function App() {
 
   return (
     <main className="app-shell">
-      <div className="status-pill">Week 1 · Feature extraction MVP</div>
       <h1>AcousticSpace</h1>
       <p className="subtitle">
         Inspect room-acoustic and breathing proxies before classifier training.
