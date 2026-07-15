@@ -12,3 +12,4 @@ llvmlite==0.43.0
 torch==2.13.0
 torch==2.13.0
 scikit-learn==1.9.0
+matplotlib==3.11.0

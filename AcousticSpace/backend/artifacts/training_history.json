@@ -1,0 +1,37 @@
+{
+  "configuration": {
+    "dataset_root": "C:\\Users\\shrey\\Datasets\\ASVspoof2019\\LA",
+    "train_manifest": "C:\\Users\\shrey\\OneDrive\\Documents\\DS_ML\\ds-ml-internship-git\\AcousticSpace\\dataset\\manifests\\train.csv",
+    "dev_manifest": "C:\\Users\\shrey\\OneDrive\\Documents\\DS_ML\\ds-ml-internship-git\\AcousticSpace\\dataset\\manifests\\dev.csv",
+    "batch_size": 32,
+    "learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "maximum_epochs": 10,
+    "patience": 3,
+    "seed": 42,
+    "device": "cpu"
+  },
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.4945067157136633,
+      "train_accuracy": 0.7626871552403467,
+      "dev_loss": 0.3408572851083279,
+      "dev_accuracy": 0.8586781516663983
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.3171932254042374,
+      "train_accuracy": 0.8729314420803782,
+      "dev_loss": 0.32941073239688745,
+      "dev_accuracy": 0.863105780067622
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.22336100568162634,
+      "train_accuracy": 0.9157604412923562,
+      "dev_loss": 0.264881193021735,
+      "dev_accuracy": 0.9043229753662856
+    }
+  ]
+}
