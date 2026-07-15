@@ -18,3 +18,9 @@
 *.pt
 *.pth
 *.onnx
+# AcousticSpace datasets 
+AcousticSpace/dataset/raw/
+AcousticSpace/dataset/**/*.zip
+AcousticSpace/backend/models/*.pt
+AcousticSpace/backend/__pycache__/
+AcousticSpace/backend/ml/__pycache__/
