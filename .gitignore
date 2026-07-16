@@ -24,3 +24,6 @@ AcousticSpace/dataset/**/*.zip
 AcousticSpace/backend/models/*.pt
 AcousticSpace/backend/__pycache__/
 AcousticSpace/backend/ml/__pycache__/
+AcousticSpace/backend/artifacts/smoke_*.json
+AcousticSpace/backend/artifacts/smoke_*.png
+AcousticSpace/backend/models/smoke_*.pt
