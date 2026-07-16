@@ -50,3 +50,71 @@ button:disabled { opacity: .62; cursor: wait; }
   .metrics-grid { grid-template-columns: 1fr; }
   .progress-track { width: 58vw; }
 }
+.waveform-card {
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #293750;
+  border-radius: 18px;
+  background: #111a2b;
+}
+
+.waveform-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.waveform-heading h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.waveform-heading p {
+  margin: 0.35rem 0 0;
+  color: #8fa8d2;
+  overflow-wrap: anywhere;
+}
+
+.waveform-heading span {
+  color: #a7b7d1;
+  white-space: nowrap;
+}
+
+.waveform-canvas {
+  min-height: 96px;
+  padding: 0.75rem;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #0a1220;
+}
+
+.waveform-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  color: #8fa8d2;
+}
+
+.waveform-play-button {
+  min-width: 90px;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  color: white;
+  background: linear-gradient(135deg, #7c3aed, #2563eb);
+  cursor: pointer;
+}
+
+.waveform-play-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+  .waveform-heading {
+    flex-direction: column;
+  }
+}
