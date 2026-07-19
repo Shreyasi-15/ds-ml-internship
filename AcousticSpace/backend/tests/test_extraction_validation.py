@@ -99,5 +99,3 @@ def test_breathing_proxy_focuses_on_quiet_low_frequency_audio():
     assert breathing_ratio > outside_band_ratio
     assert breathing_ratio > 0.50
     assert outside_band_ratio < 0.10
-    print(f"Breathing-band ratio: {breathing_ratio:.4f}")
-    print(f"Outside-band ratio: {outside_band_ratio:.4f}")
