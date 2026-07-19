@@ -1,5 +1,4 @@
-@'
-# AcousticSpace — Week 2 Results
+﻿# AcousticSpace — Week 2 Results
 
 ## Objective
 
@@ -90,4 +89,3 @@ See `mid_review_validation.md` for controlled acoustic validation and large-file
 The RT60, temporal-decay and breathing-band values are diagnostic acoustic proxies. They should not be described as direct measurements of a true physical room impulse response or as standalone proof that an audio recording is real or fake.
 
 The baseline CNN provides the initial classification benchmark. Advanced transformer and prediction-interface development remain planned for Week 3.
-'@ | Set-Content $week2 -Encoding utf8

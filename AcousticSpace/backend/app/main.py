@@ -1,4 +1,4 @@
-"""AcousticSpace FastAPI gateway for the Week 1 feature-extraction MVP."""
+﻿"""AcousticSpace FastAPI gateway for validated acoustic analysis."""
 
 import os
 import tempfile
@@ -14,7 +14,7 @@ from app.schemas import AnalysisResult, HealthResponse
 
 
 app = FastAPI(
-    title="AcousticSpace API (Week 1)",
+    title="AcousticSpace API",
     description="Validated audio upload and acoustic feature extraction",
     version="0.2.0",
 )
@@ -46,8 +46,8 @@ def root():
 def health_check():
     return {
         "status": "ok",
-        "week": 1,
-        "scope": "feature extraction only; classifier starts in Week 2",
+        "week": 2,
+        "scope": "feature extraction and evaluated baseline CNN; inference integration planned for Week 3",
     }
 
 

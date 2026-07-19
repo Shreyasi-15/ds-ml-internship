@@ -1,12 +1,12 @@
-# AcousticSpace
+﻿# AcousticSpace
 
-Week 1 implementation for acoustic deepfake analysis using room/reverberation
+Mid-review implementation for acoustic deepfake analysis using room/reverberation
 proxies. The system accepts audio, extracts interpretable acoustic features,
 and displays them in a React analyst dashboard.
 
-## Week 1 status
+## Mid-review status
 
-**Implementation complete and verified: 8 backend tests, frontend build, and
+**Implementation complete and verified: 12 backend tests, frontend build, and
 frontend lint all pass.**
 
 - FastAPI `/health` and `/extract-features` endpoints
@@ -19,12 +19,12 @@ frontend lint all pass.**
 - React + TypeScript dashboard configured through `VITE_API_BASE_URL`
 - Pipeline, dataset, and API tests
 
-The CNN/AST classifier and waveform visualization are **not started** because
-they belong to Week 2.
+The baseline CNN and WaveSurfer visualization are **implemented and validated**. The
+advanced transformer and live prediction integration belong to Week 3.
 
 ## Architecture
 
-| Module | Technology | Week 1 responsibility |
+| Module | Technology | Current responsibility |
 |---|---|---|
 | Audio pipeline | Python, Librosa | Decode audio and calculate acoustic proxies |
 | Dataset curation | Python, CSV/JSON | Validate protocols and build leakage-aware manifests |
