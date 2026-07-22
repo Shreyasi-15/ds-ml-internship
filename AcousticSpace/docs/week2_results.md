@@ -41,7 +41,7 @@ The baseline CNN contains three convolution blocks with batch normalization, ReL
 
 Class weighting is used to account for the imbalance between bonafide and spoof recordings. Training includes validation monitoring and early stopping.
 
-The best saved checkpoint reached approximately 90.43% development accuracy during the completed training epochs.
+The best saved checkpoint reached approximately 95.64% development accuracy during the completed training epochs.
 
 ## Evaluation results
 
@@ -49,11 +49,11 @@ The saved model was evaluated on all 71,237 official evaluation recordings.
 
 | Metric | Result |
 |---|---:|
-| Accuracy | 90.16% |
-| Precision | 90.25% |
-| Recall | 99.81% |
-| F1 score | 94.79% |
-| Equal Error Rate | 9.00% |
+| Accuracy | 87.65% |
+| Precision | 99.10% |
+| Recall | 87.01% |
+| F1 score | 92.66% |
+| Equal Error Rate | 10.41% |
 
 Generated artifacts:
 
@@ -89,3 +89,4 @@ See `mid_review_validation.md` for controlled acoustic validation and large-file
 The RT60, temporal-decay and breathing-band values are diagnostic acoustic proxies. They should not be described as direct measurements of a true physical room impulse response or as standalone proof that an audio recording is real or fake.
 
 The baseline CNN provides the initial classification benchmark. Advanced transformer and prediction-interface development remain planned for Week 3.
+

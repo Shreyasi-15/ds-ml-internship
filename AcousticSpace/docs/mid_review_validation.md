@@ -1,4 +1,4 @@
-# AcousticSpace — Mid-Project Validation
+﻿# AcousticSpace — Mid-Project Validation
 
 ## Review scope
 
@@ -36,11 +36,11 @@ The baseline CNN was evaluated on all 71,237 ASVspoof 2019 LA evaluation recordi
 
 | Metric | Result |
 |---|---:|
-| Accuracy | 90.16% |
-| Precision | 90.25% |
-| Recall | 99.81% |
-| F1 score | 94.79% |
-| Equal Error Rate | 9.00% |
+| Accuracy | 87.65% |
+| Precision | 99.10% |
+| Recall | 87.01% |
+| F1 score | 92.66% |
+| Equal Error Rate | 10.41% |
 
 ## Frontend architecture check
 
