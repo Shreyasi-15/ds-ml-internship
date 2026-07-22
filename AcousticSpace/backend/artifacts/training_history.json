@@ -6,7 +6,7 @@
     "batch_size": 32,
     "learning_rate": 0.001,
     "weight_decay": 0.0001,
-    "maximum_epochs": 10,
+    "maximum_epochs": 3,
     "patience": 3,
     "seed": 42,
     "device": "cpu"
@@ -14,24 +14,24 @@
   "epochs": [
     {
       "epoch": 1,
-      "train_loss": 0.4945067157136633,
-      "train_accuracy": 0.7626871552403467,
-      "dev_loss": 0.3408572851083279,
-      "dev_accuracy": 0.8586781516663983
+      "train_loss": 0.4928032041018736,
+      "train_accuracy": 0.7606776989755714,
+      "dev_loss": 0.3760102017562356,
+      "dev_accuracy": 0.8546127837707294
     },
     {
       "epoch": 2,
-      "train_loss": 0.3171932254042374,
-      "train_accuracy": 0.8729314420803782,
-      "dev_loss": 0.32941073239688745,
-      "dev_accuracy": 0.863105780067622
+      "train_loss": 0.328311748000653,
+      "train_accuracy": 0.8692277383766746,
+      "dev_loss": 0.7219604015499689,
+      "dev_accuracy": 0.6835855739816454
     },
     {
       "epoch": 3,
-      "train_loss": 0.22336100568162634,
-      "train_accuracy": 0.9157604412923562,
-      "dev_loss": 0.264881193021735,
-      "dev_accuracy": 0.9043229753662856
+      "train_loss": 0.23267349943201593,
+      "train_accuracy": 0.9107565011820331,
+      "dev_loss": 0.14380444558461786,
+      "dev_accuracy": 0.9564482369988729
     }
   ]
 }

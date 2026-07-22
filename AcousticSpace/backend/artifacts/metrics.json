@@ -1,23 +1,23 @@
 {
-  "accuracy": 0.9016381936353299,
-  "precision": 0.9025294775432785,
-  "recall": 0.9981058827212673,
-  "f1_score": 0.947914576039367,
-  "eer": 0.0899534632290999,
-  "eer_threshold": 0.985248863697052,
+  "accuracy": 0.8764686890239622,
+  "precision": 0.9910319497931821,
+  "recall": 0.870119908581447,
+  "f1_score": 0.9266483287488538,
+  "eer": 0.10411468302228119,
+  "eer_threshold": 0.41575244069099426,
   "confusion_matrix": [
     [
-      469,
-      6886
+      6852,
+      503
     ],
     [
-      121,
-      63761
+      8297,
+      55585
     ]
   ],
   "evaluated_recordings": 71237,
   "checkpoint_epoch": 3,
-  "checkpoint_dev_loss": 0.264881193021735,
-  "checkpoint_dev_accuracy": 0.9043229753662856,
+  "checkpoint_dev_loss": 0.14380444558461786,
+  "checkpoint_dev_accuracy": 0.9564482369988729,
   "model_version": "baseline-cnn-v1"
 }
