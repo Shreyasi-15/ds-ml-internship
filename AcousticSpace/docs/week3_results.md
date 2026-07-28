@@ -37,27 +37,36 @@ not proof of breathing and not a standalone real/fake detector.
 
 ## HuggingFace AST experiment
 
-`backend/ml/train_ast.py` provides the Week 3 fine-tuning workflow using
-`MIT/ast-finetuned-audioset-10-10-0.4593`.
+`backend/ml/train_ast.py` implements Week 3 fine-tuning using the pretrained
+`MIT/ast-finetuned-audioset-10-10-0.4593` Audio Spectrogram Transformer.
 
-Record the following only after running the experiment:
+### AST smoke-run result
 
-- Training and development sample counts.
-- Number of epochs.
-- Final development loss.
-- Evaluation accuracy, precision, recall, F1 and EER.
-- Hardware and runtime.
+A controlled AST fine-tuning smoke run completed successfully.
 
-Do not claim that the transformer was fully fine-tuned until the training
-command completes and its result artifacts are saved.
+- Training samples: 64
+- Development samples: 32
+- Epochs: 1
+- Batch size: 2
+- Training loss: 0.0308
+- Development loss: 0.00000118
+- Training runtime: approximately 22 minutes 36 seconds
+- Saved locally at: `backend/models/ast_week3/best`
+- Execution log: `backend/artifacts/ast_smoke_run.txt`
+
+The saved transformer is approximately 345 MB and remains outside GitHub.
+
+This smoke run validates the fine-tuning workflow. It is not a full-dataset
+transformer benchmark, and its development loss should not be presented as
+final model accuracy.
 
 ## Verification checklist
 
-- [ ] Local CNN checkpoint is non-empty.
-- [ ] `/health` reports Week 3.
-- [ ] `/predict` returns probabilities and segments.
-- [ ] Suspicious segments appear on the waveform.
-- [ ] Backend tests pass.
-- [ ] Frontend lint passes.
-- [ ] Frontend production build passes.
-- [ ] AST smoke fine-tuning completes.
+- [x] Local CNN checkpoint is non-empty.
+- [x] `/health` reports Week 3.
+- [x] `/predict` returns probabilities and segments.
+- [x] Suspicious segments appear on the waveform.
+- [x] Backend tests pass: 13 passed.
+- [x] Frontend lint passes.
+- [x] Frontend production build passes.
+- [x] AST smoke fine-tuning completes.
