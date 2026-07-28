@@ -1,0 +1,3 @@
+# Install after the stable requirements.txt environment is working.
+transformers==4.44.2
+accelerate==0.34.2
