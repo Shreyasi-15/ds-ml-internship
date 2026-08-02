@@ -320,13 +320,16 @@ function App() {
 
             <div>
               <span>Active model</span>
-              <strong>Baseline CNN</strong>
+              <strong>
+                {result?.model_version ??
+                  "ast-asvspoof2019-la-v1"}
+              </strong>
             </div>
 
             <div>
-              <span>AST experiment</span>
+              <span>AST checkpoint</span>
               <strong className="experiment-status">
-                Smoke validated
+                Trained and loaded
               </strong>
             </div>
 
@@ -446,7 +449,7 @@ function App() {
               <span>Active model</span>
               <strong>
                 {result?.model_version ??
-                  "baseline-cnn-v1"}
+                  "ast-asvspoof2019-la-v1"}
               </strong>
             </div>
 
@@ -648,8 +651,8 @@ function App() {
                 </span>
                 <h2>AI Threat Assessment</h2>
                 <p>
-                  Baseline classification with
-                  acoustic evidence.
+                  AST classification with acoustic
+                  evidence.
                 </p>
               </div>
 
@@ -713,8 +716,8 @@ function App() {
                 </div>
 
                 <p className="evidence-note">
-                  This is a research baseline, not a
-                  final forensic verdict. Review all
+                  This is a research AST detector, not
+                  a final forensic verdict. Review all
                   segment and acoustic evidence.
                 </p>
 

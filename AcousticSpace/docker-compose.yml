@@ -3,8 +3,8 @@ services:
     build:
       context: ./backend
     environment:
-      ACOUSTICSPACE_MODEL_PATH: /app/models/baseline_cnn.pt
-      ACOUSTICSPACE_INFERENCE_BATCH_SIZE: "32"
+      ACOUSTICSPACE_MODEL_PATH: /app/models/ast_asvspoof_v1/best
+      ACOUSTICSPACE_INFERENCE_BATCH_SIZE: "2"
     volumes:
       - ./backend/models:/app/models:ro
     ports:

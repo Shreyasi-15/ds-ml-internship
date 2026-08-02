@@ -17,7 +17,7 @@ from app.schemas import AnalysisResult, HealthResponse, PredictionResult
 app = FastAPI(
     title="AcousticSpace API",
     description="Acoustic feature extraction and deepfake-audio prediction",
-    version="0.3.0",
+    version="0.4.0",
 )
 
 app.add_middleware(
@@ -47,10 +47,11 @@ def root():
 def health_check():
     return {
         "status": "ok",
-        "week": 3,
+        "week": 4,
         "scope": (
-            "acoustic features, baseline CNN confidence, breathing-cadence "
-            "evidence, and suspicious four-second segments"
+            "trained AST classification, acoustic evidence, "
+            "breathing-cadence diagnostics, suspicious segments, "
+            "and Docker deployment"
         ),
     }
 
