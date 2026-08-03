@@ -1,0 +1,31 @@
+{
+  "accuracy": 0.92625,
+  "precision": 0.9896611143021252,
+  "recall": 0.8615,
+  "f1_score": 0.921144079123229,
+  "eer": 0.04775000000000002,
+  "eer_threshold": 1.3265957932162564e-05,
+  "confusion_matrix": [
+    [
+      1982,
+      18
+    ],
+    [
+      277,
+      1723
+    ]
+  ],
+  "model_version": "ast-asvspoof2019-la-v1",
+  "checkpoint_path": "/content/drive/MyDrive/AcousticSpace/ast_asvspoof_v1/best",
+  "manifest_path": "/content/ast_eval_subset/eval_subset.csv",
+  "dataset_split": "eval",
+  "subset_type": "deterministic_balanced",
+  "seed": 42,
+  "evaluated_recordings": 4000,
+  "bonafide_recordings": 2000,
+  "spoof_recordings": 2000,
+  "batch_size": 4,
+  "device": "cuda",
+  "evaluation_seconds": 398.1154,
+  "samples_per_second": 10.0473
+}
