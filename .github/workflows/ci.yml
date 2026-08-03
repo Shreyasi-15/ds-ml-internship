@@ -1,0 +1,108 @@
+name: AcousticSpace CI
+
+on:
+  push:
+    branches:
+      - main
+      - week4
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: AcousticSpace/backend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: AcousticSpace/backend/requirements.txt
+
+      - name: Install CPU PyTorch
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            --index-url https://download.pytorch.org/whl/cpu \
+            torch==2.4.1
+
+      - name: Install backend dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Compile backend modules
+        run: |
+          python -m py_compile app/main.py
+          python -m py_compile app/inference.py
+          python -m py_compile ml/train_ast.py
+          python -m py_compile ml/evaluate_ast.py
+
+      - name: Run backend tests
+        run: python -m pytest
+
+  frontend:
+    name: Frontend checks
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: AcousticSpace/frontend
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: AcousticSpace/frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+  repository-safety:
+    name: Repository safety
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Reject committed model binaries
+        shell: bash
+        run: |
+          tracked_models="$(
+            git ls-files |
+            grep -E '\.(pt|pth|onnx|safetensors)$' ||
+            true
+          )"
+
+          if [ -n "$tracked_models" ]; then
+            echo "Model binaries must remain outside Git:"
+            echo "$tracked_models"
+            exit 1
+          fi
+
+      - name: Validate Docker Compose configuration
+        working-directory: AcousticSpace
+        run: docker compose config

@@ -1,84 +1,109 @@
 ﻿# AcousticSpace
 
-Mid-review implementation for acoustic deepfake analysis using room/reverberation
-proxies. The system accepts audio, extracts interpretable acoustic features,
-and displays them in a React analyst dashboard.
+AcousticSpace is an end-to-end deepfake-audio research system built with a fine-tuned Audio Spectrogram Transformer, FastAPI, React, Librosa, Docker, and GitHub Actions.
 
-## Mid-review status
+The application classifies uploaded recordings as bonafide or spoof, displays recording and segment probabilities, renders an interactive waveform, and reports independent acoustic evidence for analyst review.
 
-**Implementation complete and verified: 12 backend tests, frontend build, and
-frontend lint all pass.**
+> AcousticSpace is a research prototype, not a final forensic decision system.
 
-- FastAPI `/health` and `/extract-features` endpoints
-- Upload validation, size limit, duration limit, and temporary-file cleanup
-- Librosa mel-spectrogram, RT60 proxy, temporal-decay ratio, and quiet-frame
-  breathing-band ratio
-- ASVspoof-style protocol parser, manifest schema, label/file validation, and
-  JSON dataset summaries
-- Four-file synthetic smoke-test dataset (not training data)
-- React + TypeScript dashboard configured through `VITE_API_BASE_URL`
-- Pipeline, dataset, and API tests
+## Final Project Status
 
-The baseline CNN and WaveSurfer visualization are **implemented and validated**. The
-advanced transformer and live prediction integration belong to Week 3.
+The planned implementation is complete and validated:
+
+- Fine-tuned HuggingFace Audio Spectrogram Transformer.
+- Balanced AST training on ASVspoof 2019 LA.
+- Reproducible evaluation on unseen evaluation recordings.
+- FastAPI AST inference integration.
+- Four-second suspicious-segment analysis.
+- Acoustic and breathing-cadence diagnostics.
+- React and TypeScript analyst dashboard.
+- Browser-based analysis history.
+- Docker Compose deployment.
+- GitHub Actions continuous integration.
+- 13 backend tests passing.
+- Frontend lint and production build passing.
+- Backend and frontend containers healthy.
+
+## Final Evaluation Results
+
+The final evaluation used a deterministic balanced 4,000-record subset of the official unseen ASVspoof 2019 LA evaluation split.
+
+| Metric | Result |
+|---|---:|
+| Evaluated recordings | 4,000 |
+| Bonafide recordings | 2,000 |
+| Spoof recordings | 2,000 |
+| Accuracy | 92.625% |
+| Precision | 98.966% |
+| Recall | 86.150% |
+| F1 score | 92.114% |
+| Equal Error Rate | 4.775% |
+| GPU evaluation time | 398.12 seconds |
+| Throughput | 10.05 recordings/second |
+
+Confusion matrix:
+
+| Actual / Predicted | Bonafide | Spoof |
+|---|---:|---:|
+| Bonafide | 1,982 | 18 |
+| Spoof | 277 | 1,723 |
+
+The model has high spoof precision but missed 277 of the 2,000 spoof recordings. Results must therefore be interpreted as decision support rather than a forensic verdict.
+
+The evaluation covers a balanced subset, not the complete 71,237-record evaluation split.
+
+Detailed methodology and limitations are documented in [docs/final_project_report.md](docs/final_project_report.md).
 
 ## Architecture
 
-| Module | Technology | Current responsibility |
+| Module | Technology | Responsibility |
 |---|---|---|
-| Audio pipeline | Python, Librosa | Decode audio and calculate acoustic proxies |
-| Dataset curation | Python, CSV/JSON | Validate protocols and build leakage-aware manifests |
-| API gateway | FastAPI | Validate uploads and return a typed feature report |
-| Analyst dashboard | React, TypeScript | Upload audio and display feature results |
+| Audio pipeline | Python, Librosa | Audio decoding, resampling, segmentation, and acoustic diagnostics |
+| Transformer classifier | PyTorch, HuggingFace AST | Bonafide/spoof classification |
+| API gateway | FastAPI, Uvicorn | Upload validation, feature extraction, and AST inference |
+| Analyst dashboard | React, TypeScript | Upload, waveform, prediction, segment evidence, and history |
+| Reverse proxy | Nginx | Frontend hosting and `/api` proxy |
+| Deployment | Docker Compose | Reproducible backend and frontend services |
+| Continuous integration | GitHub Actions | Backend, frontend, and repository-safety checks |
 
-## Project structure
+## Model
+
+The production inference model is:
+
+`ast-asvspoof2019-la-v1`
+
+It was initialized from:
+
+`MIT/ast-finetuned-audioset-10-10-0.4593`
+
+Training configuration:
+
+| Setting | Value |
+|---|---|
+| Training recordings | 5,000 balanced |
+| Development recordings | 4,000 balanced |
+| Epochs | 3 |
+| Batch size | 4 |
+| Learning rate | 2e-5 |
+| Sampling rate | 16 kHz |
+| Hardware | NVIDIA Tesla T4 |
+| Seed | 42 |
+
+Development metrics were:
+
+- Accuracy: 99.275%
+- Precision: 98.715%
+- Recall: 99.850%
+- F1: 99.279%
+- EER: 0.600%
+
+Development metrics were used during model selection and are not final unseen results.
+
+## Model Checkpoint Setup
+
+The trained checkpoint is approximately 329 MB and is intentionally excluded from Git.
+
+Place the checkpoint files in:
 
 ```text
-AcousticSpace/
-├── backend/
-│   ├── app/                 # API, schemas, configuration, pipeline, curation
-│   ├── tests/               # pipeline, dataset, and endpoint tests
-│   └── requirements.txt
-├── dataset/
-│   ├── README.md            # selected source and curation rules
-│   └── demo/                # generated smoke-test WAVs and manifest
-├── docs/week1_validation.md
-├── frontend/                # React + TypeScript dashboard
-└── scripts/generate_demo_dataset.py
-```
-
-## Quick start
-
-Backend:
-
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python -m pytest
-uvicorn app.main:app --reload --port 8000
-```
-
-Frontend, in a second terminal:
-
-```bash
-cd frontend
-npm install
-copy .env.example .env
-npm run dev
-```
-
-See `dataset/README.md` for curation commands and
-`docs/week1_validation.md` for the submission checklist.
-
-## Evidence boundary
-
-An arbitrary speech clip does not contain a directly measured room impulse
-response. AcousticSpace therefore reports RT60/reverb/breathing **proxies**.
-They may become model inputs in Week 2, but they are not proof that audio is
-real or fake.
-
-## Author
-
-Shreyasi — Data Science & Machine Learning Intern, Infotact Solutions
+AcousticSpace/backend/models/ast_asvspoof_v1/best/
