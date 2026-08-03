@@ -47,6 +47,7 @@ jobs:
           python -m py_compile app/main.py
           python -m py_compile app/inference.py
           python -m py_compile ml/train_ast.py
+          python -m py_compile ml/evaluate_ast.py
 
       - name: Run backend tests
         run: python -m pytest

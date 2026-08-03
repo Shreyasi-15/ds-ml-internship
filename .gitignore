@@ -29,3 +29,4 @@ AcousticSpace/backend/artifacts/smoke_*.png
 AcousticSpace/backend/models/smoke_*.pt
 AcousticSpace/backend/models/ast_week3/
 AcousticSpace/backend/models/ast_*/
+AcousticSpace/backend/artifacts/ast_eval_smoke_*
