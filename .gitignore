@@ -30,3 +30,7 @@ AcousticSpace/backend/models/smoke_*.pt
 AcousticSpace/backend/models/ast_week3/
 AcousticSpace/backend/models/ast_*/
 AcousticSpace/backend/artifacts/ast_eval_smoke_*
+# Local AcousticSpace authentication data
+AcousticSpace/backend/data/*.db
+AcousticSpace/backend/data/*.db-shm
+AcousticSpace/backend/data/*.db-wal

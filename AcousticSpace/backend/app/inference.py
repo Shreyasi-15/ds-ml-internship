@@ -333,6 +333,15 @@ def predict_audio(audio_path: str | Path) -> dict:
 
     duration = len(waveform) / SAMPLE_RATE
 
+    record_probability = (
+        _predict_segment_probabilities(
+            [waveform],
+            feature_extractor,
+            model,
+            device,
+        )[0]
+    )
+
     segments, boundaries = _segment_waveform(waveform)
 
     probabilities = _predict_segment_probabilities(
@@ -376,7 +385,7 @@ def predict_audio(audio_path: str | Path) -> dict:
         )
 
     spoof_probability = float(
-        np.mean(raw_spoof_probabilities)
+        record_probability[1]
     )
 
     bonafide_probability = 1.0 - spoof_probability

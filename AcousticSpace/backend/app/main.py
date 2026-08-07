@@ -3,16 +3,52 @@
 import os
 import tempfile
 from pathlib import Path
+from fastapi import (
+    Cookie,
+    Depends,
+    FastAPI,
+    File,
+    HTTPException,
+    Response,
+    UploadFile,
+    status,
+)
 
-from fastapi import FastAPI, File, HTTPException, UploadFile, status
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
 
 from app.audio_pipeline import AudioValidationError, extract_features
 from app.config import ALLOWED_CONTENT_TYPES, ALLOWED_EXTENSIONS, MAX_UPLOAD_BYTES
 from app.inference import ModelUnavailableError, predict_audio
-from app.schemas import AnalysisResult, HealthResponse, PredictionResult
 
+from app.auth import (
+    SESSION_COOKIE_NAME,
+    clear_session_cookie,
+    create_session,
+    delete_session,
+    register_user,
+    require_authenticated_user,
+    set_session_cookie,
+    verify_credentials,
+)
+
+from app.schemas import (
+    AnalysisResult,
+    HealthResponse,
+    LoginRequest,
+    LogoutResponse,
+    PredictionResult,
+    RegisterRequest,
+    UserResponse,
+    AnalysisHistoryItem,
+    StatisticsResponse,
+)
+
+from app.analytics import (
+    get_analysis_history,
+    get_user_statistics,
+    save_analysis,
+)
 
 app = FastAPI(
     title="AcousticSpace API",
@@ -55,6 +91,97 @@ def health_check():
         ),
     }
 
+@app.post(
+    "/auth/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+def register(
+    request: RegisterRequest,
+    response: Response,
+):
+    user = register_user(
+        email=request.email,
+        display_name=request.display_name,
+        password=request.password,
+    )
+
+    token = create_session(user["id"])
+    set_session_cookie(response, token)
+
+    return user
+
+
+@app.post(
+    "/auth/login",
+    response_model=UserResponse,
+)
+def login(
+    request: LoginRequest,
+    response: Response,
+):
+    user = verify_credentials(
+        email=request.email,
+        password=request.password,
+    )
+
+    token = create_session(user["id"])
+    set_session_cookie(response, token)
+
+    return user
+
+@app.get(
+    "/auth/me",
+    response_model=UserResponse,
+)
+def authenticated_user(
+    user: dict = Depends(require_authenticated_user),
+):
+    return user
+
+
+@app.post(
+    "/auth/logout",
+    response_model=LogoutResponse,
+)
+def logout(
+    response: Response,
+    session_token: str | None = Cookie(
+        default=None,
+        alias=SESSION_COOKIE_NAME,
+    ),
+):
+    delete_session(session_token)
+    clear_session_cookie(response)
+
+    return {"message": "Signed out successfully."}
+
+@app.get(
+    "/history",
+    response_model=list[AnalysisHistoryItem],
+)
+def analysis_history(
+    authenticated_user: dict = Depends(
+        require_authenticated_user
+    ),
+):
+    return get_analysis_history(
+        authenticated_user["id"],
+    )
+
+
+@app.get(
+    "/statistics",
+    response_model=StatisticsResponse,
+)
+def analysis_statistics(
+    authenticated_user: dict = Depends(
+        require_authenticated_user
+    ),
+):
+    return get_user_statistics(
+        authenticated_user["id"],
+    )
 
 async def _read_validated_upload(file: UploadFile) -> tuple[str, str, bytes]:
     filename = Path(file.filename or "").name
@@ -93,7 +220,13 @@ def _write_temporary_audio(content: bytes, suffix: str) -> str:
 
 
 @app.post("/extract-features", response_model=AnalysisResult)
-async def extract_features_endpoint(file: UploadFile = File(...)):
+async def extract_features_endpoint(
+    file: UploadFile = File(...),
+    authenticated_user: dict = Depends(
+        require_authenticated_user
+    ),
+):
+    del authenticated_user
     filename, suffix, content = await _read_validated_upload(file)
     tmp_path: str | None = None
     try:
@@ -116,7 +249,12 @@ async def extract_features_endpoint(file: UploadFile = File(...)):
 
 
 @app.post("/predict", response_model=PredictionResult)
-async def predict_endpoint(file: UploadFile = File(...)):
+async def predict_endpoint(
+    file: UploadFile = File(...),
+    authenticated_user: dict = Depends(
+        require_authenticated_user
+    ),
+):
     filename, suffix, content = await _read_validated_upload(file)
     tmp_path: str | None = None
     try:
@@ -129,5 +267,12 @@ async def predict_endpoint(file: UploadFile = File(...)):
     finally:
         if tmp_path and os.path.exists(tmp_path):
             os.remove(tmp_path)
+
+    await run_in_threadpool(
+        save_analysis,
+        authenticated_user["id"],
+        filename,
+        prediction,
+    )
 
     return {"filename": filename, **prediction}
