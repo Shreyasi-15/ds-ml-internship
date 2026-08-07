@@ -21,7 +21,10 @@ def _wav_bytes() -> bytes:
     return buffer.getvalue()
 
 
-def test_predict_endpoint_returns_confidence_and_segments(monkeypatch):
+def test_predict_endpoint_returns_confidence_and_segments(
+    monkeypatch,
+    authenticated_client,
+):
     def fake_prediction(_path):
         return {
             "predicted_label": "spoof",
@@ -46,11 +49,27 @@ def test_predict_endpoint_returns_confidence_and_segments(monkeypatch):
                 "event_times_sec": [2.1],
             },
         }
+    monkeypatch.setattr(
+        main_module,
+        "predict_audio",
+        fake_prediction,
+    )
 
-    monkeypatch.setattr(main_module, "predict_audio", fake_prediction)
-    response = client.post(
+    monkeypatch.setattr(
+        main_module,
+        "save_analysis",
+        lambda *_arguments: None,
+    )
+
+    response = authenticated_client.post(
         "/predict",
-        files={"file": ("sample.wav", _wav_bytes(), "audio/wav")},
+        files={
+            "file": (
+                "sample.wav",
+                _wav_bytes(),
+                "audio/wav",
+            )
+        },
     )
 
     assert response.status_code == 200

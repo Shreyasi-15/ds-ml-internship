@@ -25,8 +25,10 @@ def test_health_endpoint():
     assert response.json()["status"] == "ok"
 
 
-def test_extract_features_endpoint():
-    response = client.post(
+def test_extract_features_endpoint(
+    authenticated_client,
+):
+    response = authenticated_client.post(
         "/extract-features",
         files={"file": ("sample.wav", _wav_bytes(), "audio/wav")},
     )
@@ -37,16 +39,20 @@ def test_extract_features_endpoint():
     assert body["waveform_summary"]["duration_sec"] == 1.0
 
 
-def test_invalid_extension_returns_415():
-    response = client.post(
+def test_invalid_extension_returns_415(
+    authenticated_client,
+):
+    response = authenticated_client.post(
         "/extract-features",
         files={"file": ("notes.txt", b"not audio", "text/plain")},
     )
     assert response.status_code == 415
 
 
-def test_empty_audio_returns_400():
-    response = client.post(
+def test_empty_audio_returns_400(
+        authenticated_client,
+):
+    response = authenticated_client.post(
         "/extract-features",
         files={"file": ("empty.wav", b"", "audio/wav")},
     )

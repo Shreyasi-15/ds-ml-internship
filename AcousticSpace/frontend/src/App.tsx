@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type {
   ChangeEvent,
   DragEvent,
@@ -6,7 +6,6 @@ import type {
 import {
   Activity,
   AudioLines,
-  Bell,
   CheckCircle2,
   Clock3,
   Cpu,
@@ -21,7 +20,11 @@ import {
 } from "lucide-react";
 
 import { analyzeAudio } from "./api/analyze";
+import { getCurrentUser } from "./api/auth";
+import type { AuthUser } from "./api/auth";
+import { AuthModal } from "./components/AuthModal";
 import { WaveformViewer } from "./components/WaveformViewer";
+import { ModelStatistics } from "./components/ModelStatistics";
 import "./index.css";
 import "./week3.css";
 import type { AnalysisResult } from "./types/analysis";
@@ -31,7 +34,6 @@ const MAX_FILE_BYTES = 25 * 1024 * 1024;
 const ACCEPTED_EXTENSIONS = [
   ".wav",
   ".mp3",
-  ".mpeg",
   ".flac",
   ".m4a",
 ];
@@ -51,7 +53,7 @@ function validateFile(file: File): string | null {
     .toLowerCase();
 
   if (!ACCEPTED_EXTENSIONS.includes(extension)) {
-    return "Choose a WAV, MP3, MPEG, FLAC, or M4A audio file.";
+    return "Choose a WAV, MP3, FLAC, or M4A audio file.";
   }
 
   if (file.size === 0) {
@@ -99,6 +101,9 @@ function App() {
   const [isAnalyzing, setIsAnalyzing] =
     useState(false);
 
+  const [statisticsRefresh, setStatisticsRefresh] =
+    useState(0);
+
   const [progress, setProgress] =
     useState(0);
 
@@ -113,7 +118,17 @@ function App() {
 
   const [history, setHistory] =
     useState<HistoryEntry[]>(loadHistory);
+  const [authenticatedUser, setAuthenticatedUser] =
+  useState<AuthUser | null>(null);
 
+  const [authModalOpen, setAuthModalOpen] =
+    useState(false);
+
+  useEffect(() => {
+    void getCurrentUser()
+      .then(setAuthenticatedUser)
+      .catch(() => setAuthenticatedUser(null));
+  }, []);
   const suspiciousSegments =
     result?.segments.filter(
       (segment) => segment.suspicious,
@@ -212,7 +227,11 @@ function App() {
     if (!selectedFile || isAnalyzing) {
       return;
     }
-
+    if (!authenticatedUser) {
+      setAuthModalOpen(true);
+      setError("Sign in before analyzing an audio file.");
+      return;
+    }
     setIsAnalyzing(true);
     setError(null);
     setProgress(0);
@@ -231,6 +250,9 @@ function App() {
       setResult(data);
       setProgress(100);
       saveHistoryEntry(data, selectedFile);
+      setStatisticsRefresh(
+        (previous) => previous + 1,
+      );
     } catch (caught) {
       setError(
         caught instanceof TypeError
@@ -268,6 +290,14 @@ function App() {
           <span className="navigation-label">
             Navigation
           </span>
+
+           <a
+            className="navigation-item"
+            href="#statistics"
+          >
+            <Gauge size={19} />
+            Model statistics
+          </a>
 
           <a
             className="navigation-item active"
@@ -382,26 +412,34 @@ function App() {
               />
             </label>
 
-            <button
-              type="button"
-              className="icon-button"
-              aria-label="Notifications"
-            >
-              <Bell size={19} />
-            </button>
-
-            <div className="analyst-profile">
-              <div className="profile-avatar">
-                SC
-              </div>
-
-              <div>
-                <strong>Analyst</strong>
-                <span>Acoustic review</span>
-              </div>
+              <button
+            type="button"
+            className="analyst-profile"
+            onClick={() => setAuthModalOpen(true)}
+          >
+            <div className="profile-avatar">
+              {authenticatedUser
+                ? authenticatedUser.display_name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")
+                    .slice(0, 2)
+                    .toUpperCase()
+                : "?"}
             </div>
-          </div>
-        </header>
+
+            <div>
+              <strong>
+                {authenticatedUser?.display_name ?? "Sign in"}
+              </strong>
+
+              <span>
+                {authenticatedUser?.email ?? "Analyst account"}
+              </span>
+            </div>
+            </button>
+           </div>
+          </header>
 
         <section className="overview-grid">
           <article className="overview-card">
@@ -542,7 +580,6 @@ function App() {
               <div className="format-list">
                 <span>WAV</span>
                 <span>MP3</span>
-                <span>MPEG</span>
                 <span>FLAC</span>
                 <span>M4A</span>
               </div>
@@ -551,7 +588,7 @@ function App() {
 
               <input
                 type="file"
-                accept=".wav,.mp3,.mpeg,.flac,.m4a,audio/*"
+                accept=".wav,.mp3,.flac,.m4a,audio/*"
                 onChange={handleFileChange}
               />
             </label>
@@ -911,6 +948,12 @@ function App() {
           </section>
         </div>
 
+         <ModelStatistics
+          enabled={authenticatedUser !== null}
+          refreshKey={String(statisticsRefresh)}
+          currentResult={result}
+        />
+
         <section
           className="history-panel dashboard-panel"
           id="history"
@@ -1007,6 +1050,20 @@ function App() {
           )}
         </section>
       </main>
+       {authModalOpen && (
+        <AuthModal
+          user={authenticatedUser}
+          onAuthenticated={(user) => {
+            setAuthenticatedUser(user);
+            setError(null);
+          }}
+          onLogout={() => {
+            setAuthenticatedUser(null);
+            setResult(null);
+          }}
+          onClose={() => setAuthModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

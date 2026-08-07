@@ -8,7 +8,6 @@ ALLOWED_EXTENSIONS = {
     ".wav",
     ".flac",
     ".mp3",
-    ".mpeg",
     ".m4a",
 }
 ALLOWED_CONTENT_TYPES = {

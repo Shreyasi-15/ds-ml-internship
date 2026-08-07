@@ -1,7 +1,7 @@
 import type { AnalysisResult } from "../types/analysis";
 
 const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000"
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000"
 ).replace(/\/$/, "");
 
 async function postAudio<T>(endpoint: string, file: File): Promise<T> {
@@ -11,6 +11,7 @@ async function postAudio<T>(endpoint: string, file: File): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     method: "POST",
     body: formData,
+    credentials: "include",
   });
 
   if (!response.ok) {
