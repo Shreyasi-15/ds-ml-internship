@@ -340,7 +340,6 @@ export function ModelStatistics({
           </dl>
         </article>
       </div>
-      
       <div className="statistics-trends">
         <article className="statistics-chart-card">
           <div className="chart-heading">
