@@ -30,24 +30,22 @@ The system provides:
 ## 🧠 How It Works
 
 1. The user uploads an audio recording.
-2. The system validates and converts it to mono audio at 16 kHz.
-3. The recording is divided into four-second segments.
-4. The trained AST model examines every segment.
-5. Segment results are combined into a recording-level prediction.
-6. The dashboard displays the result, confidence, waveform, suspicious segments, and acoustic evidence.
+2. The system validates it and loads mono audio at 16 kHz.
+3. The trained AST model examines the complete recording for the final classification.
+4. The recording is separately divided into four-second segments for suspicious-segment evidence.
+5. Acoustic and breathing-cadence measurements are calculated as supporting evidence.
+6. The dashboard displays the final prediction, probabilities, waveform, segment evidence, and acoustic measurements.
 
 ```text
 Audio Upload
      ↓
 Validation and Preprocessing
      ↓
-Four-Second Segmentation
+Complete Recording → AST → Final Prediction
      ↓
-Audio Spectrogram Transformer
+Four-Second Analysis → Suspicious Segment Evidence
      ↓
-Prediction and Confidence
-     ↓
-React Analyst Dashboard
+Acoustic Evidence and React Dashboard
 ```
 
 ---
@@ -167,26 +165,8 @@ The final evaluation covered a deterministic balanced 4,000-record subset of the
 
 AcousticSpace is a research prototype and must not be treated as a guaranteed forensic verdict.
 
-1. The user uploads an audio recording.
-2. The system validates it and loads mono audio at 16 kHz.
-3. The trained AST model examines the complete recording for the final classification.
-4. The recording is separately divided into four-second segments for suspicious-segment evidence.
-5. Acoustic and breathing-cadence measurements are calculated as supporting evidence.
-6. The dashboard displays the final prediction, probabilities, waveform, segment evidence, and acoustic measurements.
-
-Audio Upload
-     ↓
-Validation and Preprocessing
-     ↓
-Complete Recording → AST → Final Prediction
-     ↓
-Four-Second Analysis → Suspicious Segment Evidence
-     ↓
-Acoustic Evidence and React Dashboard
----
-
 ## 👩‍💻 Author
 
-**Shreyasi Chowdhury**  
-Data Science & Machine Learning Intern  
+**Shreyasi Chowdhury**<br>
+Data Science & Machine Learning Intern<br>
 Infotact Solutions
