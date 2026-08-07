@@ -167,6 +167,22 @@ The final evaluation covered a deterministic balanced 4,000-record subset of the
 
 AcousticSpace is a research prototype and must not be treated as a guaranteed forensic verdict.
 
+1. The user uploads an audio recording.
+2. The system validates it and loads mono audio at 16 kHz.
+3. The trained AST model examines the complete recording for the final classification.
+4. The recording is separately divided into four-second segments for suspicious-segment evidence.
+5. Acoustic and breathing-cadence measurements are calculated as supporting evidence.
+6. The dashboard displays the final prediction, probabilities, waveform, segment evidence, and acoustic measurements.
+
+Audio Upload
+     ↓
+Validation and Preprocessing
+     ↓
+Complete Recording → AST → Final Prediction
+     ↓
+Four-Second Analysis → Suspicious Segment Evidence
+     ↓
+Acoustic Evidence and React Dashboard
 ---
 
 ## 👩‍💻 Author
