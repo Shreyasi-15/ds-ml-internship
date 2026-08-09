@@ -34,3 +34,7 @@ AcousticSpace/backend/artifacts/ast_eval_smoke_*
 AcousticSpace/backend/data/*.db
 AcousticSpace/backend/data/*.db-shm
 AcousticSpace/backend/data/*.db-wal
+# Local domain-adaptation audio
+AcousticSpace/dataset/domain_adaptation/**
+!AcousticSpace/dataset/domain_adaptation/**/
+!AcousticSpace/dataset/domain_adaptation/**/.gitkeep
