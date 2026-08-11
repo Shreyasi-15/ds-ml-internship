@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import type {
   ChangeEvent,
   DragEvent,
@@ -352,7 +352,7 @@ function App() {
               <span>Active model</span>
               <strong>
                 {result?.model_version ??
-                  "ast-asvspoof2019-la-v1"}
+                  "wav2vec2-asvspoof-domain-v2"}
               </strong>
             </div>
 
@@ -487,7 +487,7 @@ function App() {
               <span>Active model</span>
               <strong>
                 {result?.model_version ??
-                  "ast-asvspoof2019-la-v1"}
+                  "wav2vec2-asvspoof-domain-v2"}
               </strong>
             </div>
 
@@ -1068,3 +1068,4 @@ function App() {
   );
 }
 export default App;
+

@@ -1,4 +1,4 @@
-"""Persistent per-user analysis history and statistics."""
+﻿"""Persistent per-user analysis history and statistics."""
 
 from __future__ import annotations
 
@@ -12,12 +12,12 @@ from app.auth import (
 
 
 MODEL_EVALUATION = {
-    "accuracy": 0.92625,
-    "precision": 0.9896611143021252,
-    "recall": 0.8615,
-    "f1_score": 0.921144079123229,
-    "eer": 0.04775000000000002,
-    "evaluated_recordings": 4000,
+    "accuracy": 0.99,
+    "precision": 0.9939516129032258,
+    "recall": 0.986,
+    "f1_score": 0.9899598393574297,
+    "eer": 0.009000000000000005,
+    "evaluated_recordings": 1000,
 }
 
 
