@@ -14,7 +14,6 @@ import {
   Gauge,
   History as HistoryIcon,
   LayoutDashboard,
-  Search,
   ShieldCheck,
   UploadCloud,
 } from "lucide-react";
@@ -38,14 +37,6 @@ const ACCEPTED_EXTENSIONS = [
   ".m4a",
 ];
 
-type HistoryEntry = {
-  id: string;
-  filename: string;
-  label: string;
-  confidence: number;
-  model: string;
-  analyzedAt: string;
-};
 
 function validateFile(file: File): string | null {
   const extension = file.name
@@ -71,26 +62,6 @@ function percentage(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
 }
 
-function loadHistory(): HistoryEntry[] {
-  try {
-    const storedHistory = window.localStorage.getItem(
-      "acousticspace-history",
-    );
-
-    if (!storedHistory) {
-      return [];
-    }
-
-    const parsedHistory: unknown = JSON.parse(storedHistory);
-
-    return Array.isArray(parsedHistory)
-      ? (parsedHistory as HistoryEntry[])
-      : [];
-  } catch {
-    return [];
-  }
-}
-
 function App() {
   const [selectedFile, setSelectedFile] =
     useState<File | null>(null);
@@ -113,11 +84,6 @@ function App() {
   const [error, setError] =
     useState<string | null>(null);
 
-  const [searchQuery, setSearchQuery] =
-    useState("");
-
-  const [history, setHistory] =
-    useState<HistoryEntry[]>(loadHistory);
   const [authenticatedUser, setAuthenticatedUser] =
   useState<AuthUser | null>(null);
 
@@ -134,11 +100,6 @@ function App() {
       (segment) => segment.suspicious,
     ) ?? [];
 
-  const filteredHistory = history.filter((entry) =>
-    entry.filename
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase()),
-  );
 
   const currentDate = new Intl.DateTimeFormat(
     "en-IN",
@@ -188,41 +149,6 @@ function App() {
     }
   };
 
-  const saveHistoryEntry = (
-    data: AnalysisResult,
-    file: File,
-  ) => {
-    const entry: HistoryEntry = {
-      id: `${Date.now()}-${file.name}`,
-      filename: file.name,
-      label: data.predicted_label,
-      confidence: data.confidence,
-      model: data.model_version,
-      analyzedAt: new Date().toISOString(),
-    };
-
-    setHistory((previousHistory) => {
-      const updatedHistory = [
-        entry,
-        ...previousHistory,
-      ].slice(0, 12);
-
-      window.localStorage.setItem(
-        "acousticspace-history",
-        JSON.stringify(updatedHistory),
-      );
-
-      return updatedHistory;
-    });
-  };
-
-  const clearHistory = () => {
-    setHistory([]);
-    window.localStorage.removeItem(
-      "acousticspace-history",
-    );
-  };
-
   const handleAnalyze = async () => {
     if (!selectedFile || isAnalyzing) {
       return;
@@ -249,7 +175,6 @@ function App() {
 
       setResult(data);
       setProgress(100);
-      saveHistoryEntry(data, selectedFile);
       setStatisticsRefresh(
         (previous) => previous + 1,
       );
@@ -357,7 +282,7 @@ function App() {
             </div>
 
             <div>
-              <span>AST checkpoint</span>
+              <span>Wav2Vec2 checkpoint</span>
               <strong className="experiment-status">
                 Trained and loaded
               </strong>
@@ -395,22 +320,6 @@ function App() {
           </div>
 
           <div className="header-actions">
-            <label className="search-box">
-              <Search
-                size={18}
-                aria-hidden="true"
-              />
-
-              <input
-                type="search"
-                value={searchQuery}
-                placeholder="Search history"
-                aria-label="Search analysis history"
-                onChange={(event) =>
-                  setSearchQuery(event.target.value)
-                }
-              />
-            </label>
 
               <button
             type="button"
@@ -688,8 +597,7 @@ function App() {
                 </span>
                 <h2>AI Threat Assessment</h2>
                 <p>
-                  AST classification with acoustic
-                  evidence.
+                  Wav2Vec2 classification with acoustic evidence.
                 </p>
               </div>
 
@@ -753,7 +661,7 @@ function App() {
                 </div>
 
                 <p className="evidence-note">
-                  This is a research AST detector, not
+                  This is a research Wav2Vec2 detector, not
                   a final forensic verdict. Review all
                   segment and acoustic evidence.
                 </p>
@@ -870,6 +778,17 @@ function App() {
                   )}
                 </div>
 
+
+                <div className="report-section">
+                  <h3>Audio metadata</h3>
+                  <div className="metrics-grid">
+                    <div><span>Filename</span><strong>{result.filename}</strong></div>
+                    <div><span>Duration</span><strong>{result.waveform_summary.duration_sec.toFixed(2)} s</strong></div>
+                    <div><span>Sample rate</span><strong>16000 Hz</strong></div>
+                    <div><span>Prediction</span><strong>{result.predicted_label === "spoof" ? "Spoof" : "Bonafide"}</strong></div>
+                  </div>
+                </div>
+
                 <div className="report-section">
                   <h3>Acoustic features</h3>
 
@@ -932,6 +851,19 @@ function App() {
                         )}
                       </strong>
                     </div>
+                    <div>
+                      <span>Spectral centroid</span>
+                      <strong>
+                        {result.spectral_centroid_hz.toFixed(2)} Hz
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>Spectral bandwidth</span>
+                      <strong>
+                        {result.spectral_bandwidth_hz.toFixed(2)} Hz
+                      </strong>
+                    </div>
 
                     <div>
                       <span>Mel shape</span>
@@ -954,101 +886,7 @@ function App() {
           currentResult={result}
         />
 
-        <section
-          className="history-panel dashboard-panel"
-          id="history"
-        >
-          <div className="history-heading">
-            <div>
-              <span className="eyebrow">
-                Browser storage
-              </span>
 
-              <h2>Recent analysis history</h2>
-
-              <p>
-                The latest analyses saved on this
-                device.
-              </p>
-            </div>
-
-            {history.length > 0 && (
-              <button
-                type="button"
-                className="secondary-button"
-                onClick={clearHistory}
-              >
-                Clear history
-              </button>
-            )}
-          </div>
-
-          {filteredHistory.length === 0 ? (
-            <div className="empty-history">
-              <HistoryIcon size={30} />
-
-              <span>
-                {searchQuery
-                  ? "No matching analysis found."
-                  : "No analysis history yet."}
-              </span>
-            </div>
-          ) : (
-            <div className="history-table-wrapper">
-              <table className="history-table">
-                <thead>
-                  <tr>
-                    <th>Recording</th>
-                    <th>Detection</th>
-                    <th>Confidence</th>
-                    <th>Model</th>
-                    <th>Analyzed</th>
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {filteredHistory.map((entry) => (
-                    <tr key={entry.id}>
-                      <td>{entry.filename}</td>
-
-                      <td>
-                        <span
-                          className={`history-label ${entry.label}`}
-                        >
-                          {entry.label}
-                        </span>
-                      </td>
-
-                      <td>
-                        {percentage(
-                          entry.confidence,
-                        )}
-                      </td>
-
-                      <td>{entry.model}</td>
-
-                      <td>
-                        {new Intl.DateTimeFormat(
-                          "en-IN",
-                          {
-                            day: "2-digit",
-                            month: "short",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          },
-                        ).format(
-                          new Date(
-                            entry.analyzedAt,
-                          ),
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
       </main>
        {authModalOpen && (
         <AuthModal
@@ -1068,4 +906,3 @@ function App() {
   );
 }
 export default App;
-

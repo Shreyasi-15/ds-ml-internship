@@ -1,4 +1,4 @@
-"""AcousticSpace FastAPI gateway for acoustic analysis and prediction."""
+﻿"""AcousticSpace FastAPI gateway for acoustic analysis and prediction."""
 
 import os
 import tempfile
@@ -35,6 +35,7 @@ from app.auth import (
 from app.schemas import (
     AnalysisResult,
     HealthResponse,
+    HistoryActionResponse,
     LoginRequest,
     LogoutResponse,
     PredictionResult,
@@ -45,8 +46,11 @@ from app.schemas import (
 )
 
 from app.analytics import (
-    get_analysis_history,
+    delete_analysis,
+    get_recent_analyses,
+    get_saved_analyses,
     get_user_statistics,
+    retain_analysis,
     save_analysis,
 )
 
@@ -65,7 +69,7 @@ app.add_middleware(
         "http://127.0.0.1:3000",
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PATCH", "DELETE"],
     allow_headers=["*"],
 )
 
@@ -85,7 +89,7 @@ def health_check():
         "status": "ok",
         "week": 4,
         "scope": (
-            "trained AST classification, acoustic evidence, "
+            "trained Wav2Vec2 classification, acoustic evidence, "
             "breathing-cadence diagnostics, suspicious segments, "
             "and Docker deployment"
         ),
@@ -156,18 +160,34 @@ def logout(
 
     return {"message": "Signed out successfully."}
 
-@app.get(
-    "/history",
-    response_model=list[AnalysisHistoryItem],
-)
-def analysis_history(
-    authenticated_user: dict = Depends(
-        require_authenticated_user
-    ),
+@app.get("/history/recent", response_model=list[AnalysisHistoryItem])
+def recent_history(authenticated_user: dict = Depends(require_authenticated_user)):
+    return get_recent_analyses(authenticated_user["id"])
+
+
+@app.get("/history/saved", response_model=list[AnalysisHistoryItem])
+def saved_history(authenticated_user: dict = Depends(require_authenticated_user)):
+    return get_saved_analyses(authenticated_user["id"])
+
+
+@app.patch("/history/{analysis_id}/keep", response_model=HistoryActionResponse)
+def keep_history_item(
+    analysis_id: int,
+    authenticated_user: dict = Depends(require_authenticated_user),
 ):
-    return get_analysis_history(
-        authenticated_user["id"],
-    )
+    if not retain_analysis(authenticated_user["id"], analysis_id):
+        raise HTTPException(status_code=404, detail="Analysis was not found.")
+    return {"message": "Analysis kept in saved history."}
+
+
+@app.delete("/history/{analysis_id}", response_model=HistoryActionResponse)
+def remove_history_item(
+    analysis_id: int,
+    authenticated_user: dict = Depends(require_authenticated_user),
+):
+    if not delete_analysis(authenticated_user["id"], analysis_id):
+        raise HTTPException(status_code=404, detail="Analysis was not found.")
+    return {"message": "Analysis deleted."}
 
 
 @app.get(
@@ -243,6 +263,8 @@ async def extract_features_endpoint(
         "rt60_estimate_sec": features["rt60_estimate"],
         "reverb_ratio": features["reverb_ratio"],
         "breathing_band_energy": features["breathing_band_energy"],
+        "spectral_centroid_hz": features["spectral_centroid_hz"],
+        "spectral_bandwidth_hz": features["spectral_bandwidth_hz"],
         "mel_spectrogram_shape": list(features["mel_spectrogram"].shape),
         "waveform_summary": features["waveform_summary"],
     }
