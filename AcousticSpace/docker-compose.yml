@@ -3,7 +3,7 @@ services:
     build:
       context: ./backend
     environment:
-      ACOUSTICSPACE_MODEL_PATH: /app/models/ast_asvspoof_v1/best
+      ACOUSTICSPACE_MODEL_PATH: /app/models/wav2vec2_asvspoof_domain_v2/best
       ACOUSTICSPACE_INFERENCE_BATCH_SIZE: "2"
     volumes:
       - ./backend/models:/app/models:ro

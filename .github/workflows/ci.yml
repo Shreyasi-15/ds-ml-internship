@@ -46,8 +46,13 @@ jobs:
         run: |
           python -m py_compile app/main.py
           python -m py_compile app/inference.py
-          python -m py_compile ml/train_ast.py
-          python -m py_compile ml/evaluate_ast.py
+          python -m py_compile app/audio_pipeline.py
+          python -m py_compile app/analytics.py
+          python -m py_compile ml/wav2vec2_data.py
+          python -m py_compile ml/train_wav2vec2.py
+          python -m py_compile ml/evaluate_wav2vec2.py
+          python -m py_compile ml/prepare_domain_adaptation.py
+          python -m py_compile ml/prepare_mixed_wav2vec2_bundle.py
 
       - name: Run backend tests
         run: python -m pytest
