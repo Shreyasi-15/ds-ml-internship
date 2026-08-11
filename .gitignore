@@ -38,3 +38,5 @@ AcousticSpace/backend/data/*.db-wal
 AcousticSpace/dataset/domain_adaptation/**
 !AcousticSpace/dataset/domain_adaptation/**/
 !AcousticSpace/dataset/domain_adaptation/**/.gitkeep
+# Local Wav2Vec2 checkpoints
+AcousticSpace/backend/models/wav2vec2_*/

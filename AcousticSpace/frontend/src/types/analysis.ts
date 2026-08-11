@@ -1,4 +1,4 @@
-export interface SegmentPrediction {
+﻿export interface SegmentPrediction {
   start_sec: number;
   end_sec: number;
   label: "bonafide" | "spoof";
@@ -11,6 +11,8 @@ export interface AnalysisResult {
   rt60_estimate_sec: number;
   reverb_ratio: number;
   breathing_band_energy: number;
+  spectral_centroid_hz: number;
+  spectral_bandwidth_hz: number;
   mel_spectrogram_shape: number[];
   waveform_summary: {
     duration_sec: number;

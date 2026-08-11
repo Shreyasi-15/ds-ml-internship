@@ -1,4 +1,4 @@
-"""AST inference for AcousticSpace deepfake-audio detection."""
+"""Wav2Vec2 inference for AcousticSpace deepfake-audio detection."""
 
 from functools import lru_cache
 import os
@@ -8,8 +8,8 @@ import librosa
 import numpy as np
 import torch
 from transformers import (
-    ASTFeatureExtractor,
-    ASTForAudioClassification,
+    AutoFeatureExtractor,
+    Wav2Vec2ForSequenceClassification,
 )
 
 
@@ -17,7 +17,7 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MODEL_PATH = (
     BACKEND_ROOT
     / "models"
-    / "ast_asvspoof_v1"
+    / "wav2vec2_asvspoof_domain_v2"
     / "best"
 )
 
@@ -27,15 +27,15 @@ SEGMENT_SAMPLES = int(SAMPLE_RATE * SEGMENT_SECONDS)
 N_FFT = 1024
 SPOOF_THRESHOLD = 0.50
 DEFAULT_BATCH_SIZE = 4
-MODEL_VERSION = "ast-asvspoof2019-la-v1"
+MODEL_VERSION = "wav2vec2-asvspoof-domain-v2"
 
 
 class ModelUnavailableError(RuntimeError):
-    """Raised when the trained AST checkpoint cannot be used."""
+    """Raised when the trained Wav2Vec2 checkpoint cannot be used."""
 
 
 def _checkpoint_path() -> Path:
-    """Return the configured AST checkpoint directory."""
+    """Return the configured Wav2Vec2 checkpoint directory."""
 
     configured = os.getenv("ACOUSTICSPACE_MODEL_PATH")
 
@@ -46,7 +46,7 @@ def _checkpoint_path() -> Path:
 
 
 def _inference_batch_size() -> int:
-    """Read and validate the AST inference batch size."""
+    """Read and validate the Wav2Vec2 inference batch size."""
 
     configured = os.getenv(
         "ACOUSTICSPACE_INFERENCE_BATCH_SIZE",
@@ -70,11 +70,11 @@ def _inference_batch_size() -> int:
 
 @lru_cache(maxsize=1)
 def load_prediction_model() -> tuple[
-    ASTFeatureExtractor,
-    ASTForAudioClassification,
+    AutoFeatureExtractor,
+    Wav2Vec2ForSequenceClassification,
     torch.device,
 ]:
-    """Load and cache the trained AST feature extractor and model."""
+    """Load and cache the trained Wav2Vec2 feature extractor and model."""
 
     model_path = _checkpoint_path()
 
@@ -93,7 +93,7 @@ def load_prediction_model() -> tuple[
     if missing_files:
         missing = ", ".join(missing_files)
         raise ModelUnavailableError(
-            f"AST checkpoint is incomplete at {model_path}. "
+            f"Wav2Vec2 checkpoint is incomplete at {model_path}. "
             f"Missing: {missing}"
         )
 
@@ -102,12 +102,12 @@ def load_prediction_model() -> tuple[
     )
 
     try:
-        feature_extractor = ASTFeatureExtractor.from_pretrained(
+        feature_extractor = AutoFeatureExtractor.from_pretrained(
             model_path,
             local_files_only=True,
         )
 
-        model = ASTForAudioClassification.from_pretrained(
+        model = Wav2Vec2ForSequenceClassification.from_pretrained(
             model_path,
             local_files_only=True,
         )
@@ -116,7 +116,7 @@ def load_prediction_model() -> tuple[
         model.eval()
     except Exception as exc:
         raise ModelUnavailableError(
-            f"AST checkpoint could not be loaded: {model_path}"
+            f"Wav2Vec2 checkpoint could not be loaded: {model_path}"
         ) from exc
 
     labels = {
@@ -126,7 +126,7 @@ def load_prediction_model() -> tuple[
 
     if labels.get(0) != "bonafide" or labels.get(1) != "spoof":
         raise ModelUnavailableError(
-            "AST checkpoint labels must be "
+            "Wav2Vec2 checkpoint labels must be "
             "{0: 'bonafide', 1: 'spoof'}"
         )
 
@@ -170,11 +170,11 @@ def _segment_waveform(
 
 def _predict_segment_probabilities(
     segments: list[np.ndarray],
-    feature_extractor: ASTFeatureExtractor,
-    model: ASTForAudioClassification,
+    feature_extractor: AutoFeatureExtractor,
+    model: Wav2Vec2ForSequenceClassification,
     device: torch.device,
 ) -> np.ndarray:
-    """Run AST inference over waveform segments in small batches."""
+    """Run Wav2Vec2 inference over waveform segments in small batches."""
 
     batch_size = _inference_batch_size()
     probability_batches: list[np.ndarray] = []
@@ -186,14 +186,20 @@ def _predict_segment_probabilities(
             waveform_batch,
             sampling_rate=SAMPLE_RATE,
             return_tensors="pt",
+            padding="max_length",
+            max_length=SEGMENT_SAMPLES,
+            truncation=True,
+            return_attention_mask=True,
         )
 
-        input_values = inputs["input_values"].to(device)
+        model_inputs = {
+            key: value.to(device)
+            for key, value in inputs.items()
+            if key in {"input_values", "attention_mask"}
+        }
 
         with torch.inference_mode():
-            logits = model(
-                input_values=input_values,
-            ).logits
+            logits = model(**model_inputs).logits
 
             probabilities = torch.softmax(
                 logits,
@@ -316,7 +322,7 @@ def estimate_breathing_cadence(
 
 
 def predict_audio(audio_path: str | Path) -> dict:
-    """Predict a recording using the trained AST checkpoint."""
+    """Predict a recording using the trained Wav2Vec2 checkpoint."""
 
     waveform, _ = librosa.load(
         audio_path,
@@ -332,16 +338,6 @@ def predict_audio(audio_path: str | Path) -> dict:
     )
 
     duration = len(waveform) / SAMPLE_RATE
-
-    record_probability = (
-        _predict_segment_probabilities(
-            [waveform],
-            feature_extractor,
-            model,
-            device,
-        )[0]
-    )
-
     segments, boundaries = _segment_waveform(waveform)
 
     probabilities = _predict_segment_probabilities(
@@ -350,6 +346,7 @@ def predict_audio(audio_path: str | Path) -> dict:
         model,
         device,
     )
+    record_probability = np.mean(probabilities, axis=0)
 
     segment_results: list[dict] = []
     raw_spoof_probabilities: list[float] = []

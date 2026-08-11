@@ -1,4 +1,4 @@
-"""
+﻿"""
 Audio Processing Pipeline
 Isolates environmental acoustics (Room Impulse Response proxy + reverb tail)
 from vocal content, and produces spectrogram features for the classifier.
@@ -149,6 +149,26 @@ def extract_features(path: str) -> dict:
     rt60 = estimate_rt60(y)
     reverb_ratio = estimate_reverb_ratio(y)
     breathing_energy = estimate_breathing_band_energy(y)
+    spectral_centroid = float(
+        np.mean(
+            librosa.feature.spectral_centroid(
+                y=y,
+                sr=SR,
+                n_fft=N_FFT,
+                hop_length=HOP_LENGTH,
+            )
+        )
+    )
+    spectral_bandwidth = float(
+        np.mean(
+            librosa.feature.spectral_bandwidth(
+                y=y,
+                sr=SR,
+                n_fft=N_FFT,
+                hop_length=HOP_LENGTH,
+            )
+        )
+    )
 
     duration = len(y) / SR
 
@@ -157,6 +177,8 @@ def extract_features(path: str) -> dict:
         "rt60_estimate": rt60,
         "reverb_ratio": reverb_ratio,
         "breathing_band_energy": breathing_energy,
+        "spectral_centroid_hz": spectral_centroid,
+        "spectral_bandwidth_hz": spectral_bandwidth,
         "waveform_summary": {
             "duration_sec": round(duration, 2),
             "peak_amplitude": float(np.max(np.abs(y))) if len(y) else 0.0,

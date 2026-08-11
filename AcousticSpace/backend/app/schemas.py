@@ -1,4 +1,4 @@
-"""Typed response contracts shared by the FastAPI endpoints."""
+﻿"""Typed response contracts shared by the FastAPI endpoints."""
 
 from pydantic import BaseModel, Field
 
@@ -16,6 +16,8 @@ class AnalysisResult(BaseModel):
     )
     reverb_ratio: float = Field(ge=0)
     breathing_band_energy: float = Field(ge=0, le=1)
+    spectral_centroid_hz: float = Field(ge=0)
+    spectral_bandwidth_hz: float = Field(ge=0)
     mel_spectrogram_shape: list[int]
     waveform_summary: WaveformSummary
 
@@ -80,6 +82,11 @@ class AnalysisHistoryItem(BaseModel):
     confidence: float = Field(ge=0, le=1)
     model_version: str
     analyzed_at: str
+    retained: bool = False
+
+
+class HistoryActionResponse(BaseModel):
+    message: str
 
 
 class ModelEvaluationMetrics(BaseModel):

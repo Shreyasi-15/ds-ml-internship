@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import type { AnalysisResult } from "../types/analysis";
 import {
   Activity,
@@ -9,8 +9,11 @@ import {
 } from "lucide-react";
 
 import {
-  getAnalysisHistory,
+  deleteAnalysis,
+  getRecentHistory,
+  getSavedHistory,
   getStatistics,
+  keepAnalysis,
 } from "../api/statistics";
 import type {
   AnalysisHistoryItem,
@@ -35,16 +38,32 @@ export function ModelStatistics({
   const [statistics, setStatistics] =
     useState<AnalysisStatistics | null>(null);
 
-  const [history, setHistory] =
+  const [recentHistory, setRecentHistory] =
     useState<AnalysisHistoryItem[]>([]);
+
+  const [savedHistory, setSavedHistory] =
+    useState<AnalysisHistoryItem[]>([]);
+
+  const [actionRefresh, setActionRefresh] = useState(0);
 
   const [error, setError] =
     useState<string | null>(null);
 
   const [loading, setLoading] = useState(false);
 
+    const keepItem = async (id: number) => {
+    try { await keepAnalysis(id); setActionRefresh((value) => value + 1); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : "Analysis could not be kept."); }
+  };
+
+  const deleteItem = async (id: number) => {
+    if (!window.confirm("Permanently delete this analysis?")) return;
+    try { await deleteAnalysis(id); setActionRefresh((value) => value + 1); }
+    catch (caught) { setError(caught instanceof Error ? caught.message : "Analysis could not be deleted."); }
+  };
   useEffect(() => {
-    if (!enabled) {
+
+  if (!enabled) {
       return;
     }
 
@@ -55,15 +74,17 @@ export function ModelStatistics({
       setError(null);
 
       try {
-        const [statisticsResult, historyResult] =
+        const [statisticsResult, recentResult, savedResult] =
           await Promise.all([
             getStatistics(),
-            getAnalysisHistory(),
+            getRecentHistory(),
+            getSavedHistory(),
           ]);
 
         if (active) {
           setStatistics(statisticsResult);
-          setHistory(historyResult);
+          setRecentHistory(recentResult);
+          setSavedHistory(savedResult);
         }
       } catch (caught) {
         if (active) {
@@ -85,7 +106,7 @@ export function ModelStatistics({
     return () => {
       active = false;
     };
-  }, [enabled, refreshKey]);
+  }, [enabled, refreshKey, actionRefresh]);
 
   if (!enabled) {
     return (
@@ -456,61 +477,42 @@ export function ModelStatistics({
       </div>
 
       <div className="statistics-history">
-        <h3>Recent server-saved analyses</h3>
+        <div className="history-section-heading">
+          <div><h3>Recent server-saved analyses</h3><p>Unkept analyses expire automatically after 30 days.</p></div>
+        </div>
+        {recentHistory.length === 0 ? <p className="statistics-message">No recent analyses.</p> : (
+          <div className="statistics-table-wrapper"><table>
+            <thead><tr><th>Recording</th><th>Detection</th><th>Confidence</th><th>Date</th><th>Actions</th></tr></thead>
+            <tbody>{recentHistory.slice(0, 8).map((entry) => (
+              <tr key={entry.id}>
+                <td>{entry.filename}</td>
+                <td><span className={`statistics-label ${entry.predicted_label}`}>{entry.predicted_label === "bonafide" ? "Human" : "AI-generated"}</span></td>
+                <td>{percentage(entry.confidence)}</td>
+                <td>{new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(entry.analyzed_at))}</td>
+                <td><div className="history-actions"><button type="button" className="keep-history-button" onClick={() => void keepItem(entry.id)}>Keep</button><button type="button" className="delete-history-button" onClick={() => void deleteItem(entry.id)}>Delete</button></div></td>
+              </tr>
+            ))}</tbody>
+          </table></div>
+        )}
+      </div>
 
-        {history.length === 0 ? (
-          <p className="statistics-message">
-            No completed analyses yet.
-          </p>
-        ) : (
-          <div className="statistics-table-wrapper">
-            <table>
-              <thead>
-                <tr>
-                  <th>Recording</th>
-                  <th>Detection</th>
-                  <th>Confidence</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {history.slice(0, 8).map((entry) => (
-                  <tr key={entry.id}>
-                    <td>{entry.filename}</td>
-                    <td>
-                      <span
-                        className={
-                          `statistics-label ` +
-                          entry.predicted_label
-                        }
-                      >
-                        {entry.predicted_label ===
-                        "bonafide"
-                          ? "Human"
-                          : "AI-generated"}
-                      </span>
-                    </td>
-                    <td>
-                      {percentage(entry.confidence)}
-                    </td>
-                    <td>
-                      {new Intl.DateTimeFormat(
-                        "en-IN",
-                        {
-                          day: "2-digit",
-                          month: "short",
-                          year: "numeric",
-                        },
-                      ).format(
-                        new Date(entry.analyzed_at),
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+      <div className="statistics-history" id="history">
+        <div className="history-section-heading">
+          <div><h3>Saved History</h3><p>Records you keep remain here until you delete them.</p></div>
+        </div>
+        {savedHistory.length === 0 ? <p className="statistics-message">No saved analyses. Select Keep on a recent record.</p> : (
+          <div className="statistics-table-wrapper"><table>
+            <thead><tr><th>Recording</th><th>Detection</th><th>Confidence</th><th>Model</th><th>Saved</th><th>Action</th></tr></thead>
+            <tbody>{savedHistory.map((entry) => (
+              <tr key={entry.id}>
+                <td>{entry.filename}</td>
+                <td><span className={`statistics-label ${entry.predicted_label}`}>{entry.predicted_label === "bonafide" ? "Human" : "AI-generated"}</span></td>
+                <td>{percentage(entry.confidence)}</td><td>{entry.model_version}</td>
+                <td>{new Intl.DateTimeFormat("en-IN", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(entry.analyzed_at))}</td>
+                <td><button type="button" className="delete-history-button" onClick={() => void deleteItem(entry.id)}>Delete</button></td>
+              </tr>
+            ))}</tbody>
+          </table></div>
         )}
       </div>
 
