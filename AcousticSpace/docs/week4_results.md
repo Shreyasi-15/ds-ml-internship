@@ -1,3 +1,7 @@
+> **Historical note:** This document records the Week 4 AST implementation.  
+> The final application now uses the domain-adapted Wav2Vec2 model documented
+> in the main README and final project report.
+
 # AcousticSpace Week 4 Results
 
 ## 1. Week 4 Scope
