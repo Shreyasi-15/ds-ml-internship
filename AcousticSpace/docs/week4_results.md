@@ -1,4 +1,4 @@
-> **Historical note:** This document records the Week 4 AST implementation.  
+> **Historical note:** This document records the Week 4 AST implementation.
 > The final application now uses the domain-adapted Wav2Vec2 model documented
 > in the main README and final project report.
 

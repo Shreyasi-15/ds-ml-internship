@@ -157,6 +157,6 @@ AcousticSpace/
 
 ## Author
 
-**Shreyasi Chowdhury**  
-Data Science & Machine Learning Intern  
+**Shreyasi Chowdhury**
+Data Science & Machine Learning Intern
 Infotact Solutions
