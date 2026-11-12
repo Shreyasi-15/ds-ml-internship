@@ -117,6 +117,22 @@ docker compose ps
 
 For local development, run the FastAPI backend on port `8000` and the Vite frontend on port `5173`.
 
+## Deployment Configuration
+
+The dashboard is a static Vite build, so `VITE_API_BASE_URL` is read when the frontend is built; the
+API reads its own settings when it starts.
+
+| Variable | Set where | Purpose |
+|---|---|---|
+| `VITE_API_BASE_URL` | Frontend build environment (e.g. the hosting provider's environment variables) | Absolute URL of the API, for example `https://<space>.hf.space`. Defaults to `http://localhost:8000` for local development. |
+| `ACOUSTICSPACE_ALLOWED_ORIGINS` | Backend environment (API host) | Comma-separated extra CORS origins, such as the deployed dashboard URL. The localhost development origins stay allowed. |
+| `ACOUSTICSPACE_COOKIE_SAMESITE` | Backend environment (API host) | `lax` (default) for same-site development, or `none` when the dashboard and API are served from different sites. `none` also forces `Secure` on the session cookie, as browsers require. |
+| `ACOUSTICSPACE_SECURE_COOKIES` | Backend environment (API host) | `true` marks the session cookie `Secure` when `ACOUSTICSPACE_COOKIE_SAMESITE` is not `none`. |
+
+The checkpoint location (`ACOUSTICSPACE_MODEL_PATH`) and the SQLite location
+(`ACOUSTICSPACE_DATABASE_PATH`) must be set on the backend as well; free hosts usually reset the SQLite
+file when the service restarts.
+
 ## Project Components
 
 ```text
