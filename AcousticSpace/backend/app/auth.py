@@ -304,7 +304,17 @@ def create_session(user_id: int) -> str:
     return token
 
 
-def set_session_cookie(response: Response, token: str) -> None:
+def _session_cookie_flags() -> tuple[str, bool]:
+    """Return the SameSite policy and Secure flag for the session cookie."""
+
+    same_site = os.getenv(
+        "ACOUSTICSPACE_COOKIE_SAMESITE",
+        "lax",
+    ).strip().lower()
+
+    if same_site not in {"lax", "strict", "none"}:
+        same_site = "lax"
+
     secure_cookie = (
         os.getenv(
             "ACOUSTICSPACE_SECURE_COOKIES",
@@ -313,13 +323,23 @@ def set_session_cookie(response: Response, token: str) -> None:
         == "true"
     )
 
+    # Browsers reject SameSite=None cookies that are not marked Secure.
+    if same_site == "none":
+        secure_cookie = True
+
+    return same_site, secure_cookie
+
+
+def set_session_cookie(response: Response, token: str) -> None:
+    same_site, secure_cookie = _session_cookie_flags()
+
     response.set_cookie(
         key=SESSION_COOKIE_NAME,
         value=token,
         max_age=SESSION_LIFETIME_HOURS * 60 * 60,
         httponly=True,
         secure=secure_cookie,
-        samesite="lax",
+        samesite=same_site,
         path="/",
     )
 
@@ -345,11 +365,14 @@ def delete_session(token: str | None) -> None:
 
 
 def clear_session_cookie(response: Response) -> None:
+    same_site, secure_cookie = _session_cookie_flags()
+
     response.delete_cookie(
         key=SESSION_COOKIE_NAME,
         path="/",
         httponly=True,
-        samesite="lax",
+        secure=secure_cookie,
+        samesite=same_site,
     )
 
 

@@ -9,3 +9,4 @@ tests
 *.onnx
 models/*
 !models/.gitkeep
+!models/wav2vec2_asvspoof_domain_v2
